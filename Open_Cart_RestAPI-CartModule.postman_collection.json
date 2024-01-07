@@ -1,0 +1,419 @@
+{
+	"info": {
+		"_postman_id": "59d04e87-f847-4b4e-aca0-8f5d0711ca09",
+		"name": "Open_Cart_RestAPI-CartModule",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30934232"
+	},
+	"item": [
+		{
+			"name": "Create Token or Session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// VALIDATING STATUS CODE\r",
+							"pm.test(\"Status code is 200\",  () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// STORE RESPONSE IN VARIABLE FROM JASON RESPONSE BODY\r",
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"// VALIDATING JSON RESPONSE\r",
+							"pm.test(\"Checking sucessful massege from response\", () => {\r",
+							"    pm.expect(jsonData.success).to.eql(\"Success: API session successfully started!\");\r",
+							"});\r",
+							"\r",
+							"// CREATING COLLECTION VARIABLE TO STORE API TOKEN\r",
+							"pm.collectionVariables.set(\"api_token_val\",jsonData.api_token);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "demo",
+							"description": "Get It from administration application of open cart",
+							"type": "text"
+						},
+						{
+							"key": "key",
+							"value": "FylYe6kHNXc6Uzqrg0rLgnuIALPIRw3onXU7TijjkGMbMsY8CLCvW4V7ByMEjDZ3ZUKfX1GMxURafWlkIX6Ozgvs2mJW4i3ocMK0LTF8vSZkYdxCtm5MF4ktZaSGP5IQJWs82iUZuRFaBOjchpRkx1HMkh1PqlOELQLxQop3oxmj5CkQml7s7B3LgbhAK8jbv7zot3USXHhsxuAifD4lczQZQvuzan0gApsEodsDVMXpDnQ4cZCcIX1f1NTm47jS",
+							"description": "It is Generated key from administration application of open cart",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}api/login",
+					"host": [
+						"{{baseUrl}}api"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Product To Cart",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// CREATING ENVIRONMENT VARIABLE AS IT REQUIRED IN BODY AS A FORM DATA IN KEY AND VALUE PAIR\r",
+							"pm.environment.set(\"product_id\",\"40\");\r",
+							"pm.environment.set(\"quantity\",\"3\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// VALIDATING THE RESPONSE CODE\r",
+							"pm.test(\"Status code is 200\",  () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// VALIDATING JSON RESPONSE\r",
+							"pm.test(\"Checking Sucessfull Massege in response\", () => {\r",
+							"   var jsonData = pm.response.json();\r",
+							"   pm.expect(jsonData.success).to.eql(\"Success: You have modified your shopping cart!\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "{{api_token_val}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "api_token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "{{product_id}}",
+							"description": "Genrated as Environment Variable in Pre-request Script to pass as form-data in POST req (To Add Product To Cart)",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "{{quantity}}",
+							"description": "Genrated as Environment Variable in Pre-request Script to pass as form-data in POST req (To Add Product To Cart)",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}api/cart/add",
+					"host": [
+						"{{baseUrl}}api"
+					],
+					"path": [
+						"cart",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cart content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// VALIDATING STATUS CODE IS 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// EXTRACTING CART ID KEY FROM JSON RESPONSE BODY\r",
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"cart_id_key\",jsonData.products[0].cart_id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "{{api_token_val}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "api_token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "{{product_id}}",
+							"description": "To see the product of this product id ",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}api/cart/products",
+					"host": [
+						"{{baseUrl}}api"
+					],
+					"path": [
+						"cart",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit product quantity in cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// VALIDATING STATUS CODE IS 200\r",
+							"pm.test(\"Status code is 200\",  () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// VALIDATING JSON RESPONSE\r",
+							"pm.test(\"Checking success massege in response\", () => {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.eql(\"Success: You have modified your shopping cart!\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "{{api_token_val}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "api_token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "key",
+							"value": "{{cart_id_key}}",
+							"description": "We extract the cart id key to modify the quantity in cart",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "4",
+							"description": "How much quantity we want to edit or add in the cart",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}api/cart/edit",
+					"host": [
+						"{{baseUrl}}api"
+					],
+					"path": [
+						"cart",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove product from the cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// VALIDATING THE STATUS CODE IS 200\r",
+							"pm.test(\"Status code is 200\",  () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// VALIDATING JSON RESPONSE\r",
+							"pm.test(\"Checking success messege in response\", () => {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.eql(\"Success: You have modified your shopping cart!\");\r",
+							"});\r",
+							"\r",
+							"// UNSETTING THE COLLECTION VARIABLES\r",
+							"pm.collectionVariables.unset(\"api_token_val\");\r",
+							"\r",
+							"\r",
+							"// UNSETTING THE ENVIRONMENT VARIABLE\r",
+							"pm.environment.unset(\"cart_id_key\");\r",
+							"pm.environment.unset(\"product_id\");\r",
+							"pm.environment.unset(\"quantity\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "{{api_token_val}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "api_token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "key",
+							"value": "{{cart_id_key}}",
+							"description": "We have to provide cart id key to remove the product from the cart(We set as Environment variable extracting from the cart content request response)",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}api/cart/remove",
+					"host": [
+						"{{baseUrl}}api"
+					],
+					"path": [
+						"cart",
+						"remove"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ip",
+			"value": "192.168.0.233",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl",
+			"value": "http://{{ip}}/opencart/upload/index.php?route=",
+			"type": "string"
+		},
+		{
+			"value": "",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
